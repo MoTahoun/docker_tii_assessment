@@ -1,0 +1,5 @@
+<launch>
+    <node pkg="os_lidar_filtering" type="os_lidar_filtering_node" name="os_lidar_filtering_node" output="screen">
+      <rosparam file="$(find os_lidar_filtering)/config/params.yaml" command="load" />
+    </node>
+  </launch>

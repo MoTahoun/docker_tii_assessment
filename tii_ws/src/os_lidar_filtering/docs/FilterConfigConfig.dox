@@ -1,0 +1,13 @@
+\subsubsection parameters ROS parameters
+
+Reads and maintains the following parameters on the ROS server
+
+- \b "~min_range" : \b [double] Minimum range for pass-through filter min: 0.0, default: 3.0, max: 1000.0
+- \b "~max_range" : \b [double] Maximum range for pass-through filter min: 0.0, default: 300.0, max: 1000.0
+- \b "~noise_mean_k" : \b [int] Mean K for statistical outlier removal min: 1, default: 78, max: 100
+- \b "~noise_stddev" : \b [double] Stddev for statistical outlier removal min: 0.0, default: 3.8, max: 10.0
+- \b "~radius_search" : \b [double] Radius for radius outlier removal min: 0.0, default: 2.0, max: 10.0
+- \b "~min_neighbors" : \b [int] Min neighbors for radius outlier removal min: 0, default: 4, max: 100
+- \b "~max_iterations" : \b [int] Min neighbors for RANSAC plane removal min: 0, default: 1000, max: 2000
+- \b "~ground_distance_threshold" : \b [double] Distance threshold for ground plane removal min: 0.0, default: 0.1, max: 1.0
+

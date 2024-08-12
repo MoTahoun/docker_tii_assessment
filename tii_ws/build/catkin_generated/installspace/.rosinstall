@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /workspace/tii_ws/install/setup.sh

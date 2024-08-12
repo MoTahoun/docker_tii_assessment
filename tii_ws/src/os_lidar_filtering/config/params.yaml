@@ -1,0 +1,8 @@
+min_range: 3.0
+max_range: 300.0
+noise_mean_k: 78
+noise_stddev: 3.8
+radius_search: 2.0
+min_neighbors: 4
+max_iterations: 1000
+ground_distance_threshold: 0.1
