@@ -13,6 +13,8 @@
 #include <pcl/segmentation/sac_segmentation.h>
 #include <dynamic_reconfigure/server.h>
 #include <os_lidar_filtering/FilterConfig.h>
+#include <map>
+#include <string>
 
 
 class PointCloudProcessor {
@@ -22,6 +24,9 @@ private:
     ros::Publisher removed_range_pub_;
     ros::Publisher removed_noise_pub_;
     ros::Publisher removed_plane_pub_;
+    ros::Subscriber pointCloud_subscriber_;
+    ros::Publisher filteredCloud_publisher_;
+    ros::Publisher remobedNoise_publisher_;
     ros::WallTime start_;
     ros::WallTime end_;
     double execution_time;
@@ -64,7 +69,7 @@ private:
     //                        pcl::PointIndices::Ptr& ground_indices);
 
 public:
-    PointCloudProcessor(ros::NodeHandle& nh);
+    PointCloudProcessor(ros::NodeHandle& nh, const std::map<std::string, std::string>& params);
     void pointCloudCallback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg);
 };
 

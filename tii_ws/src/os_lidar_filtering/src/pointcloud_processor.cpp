@@ -3,27 +3,40 @@
 
 
 
-PointCloudProcessor::PointCloudProcessor(ros::NodeHandle& nh) {
+PointCloudProcessor::PointCloudProcessor(ros::NodeHandle& nh, const std::map<std::string, std::string>& params) {
     ROS_INFO("Initializing PointCloudProcessor");
+
+    // Get topic name
+    std::string input_topic = params.at("input_topic");
+    std::string output_filtered_topic = params.at("output_filtered_topic");
+    std::string output_noise_topic = params.at("output_noise_topic");
+
+    // Initialize Parameters & Dynamic configure server
+    min_range_ = std::stof(params.at("min_range"));
+    max_range_ = std::stof(params.at("max_range"));
+    noise_mean_k_ = std::stoi(params.at("noise_mean_k"));
+    noise_stddev_ = std::stof(params.at("noise_stddev"));
+    radius_search_ = std::stof(params.at("radius_search"));
+    min_neighbors_ = std::stoi(params.at("min_neighbors"));
+    max_iterations_ = std::stoi(params.at("max_iterations"));
+    ground_distance_threshold_ = std::stof(params.at("ground_distance_threshold"));
+
+
     // Initialize subscribers and publishers
-    point_cloud_sub_ = nh.subscribe("/mbuggy/os2/points", 1, &PointCloudProcessor::pointCloudCallback, this);
-    filtered_cloud_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/filtered_pointcloud", 1);
-    removed_range_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/removed_range", 1);
-    removed_noise_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/removed_noise", 1);
-    removed_plane_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/removed_plane", 1);
+    // point_cloud_sub_ = nh.subscribe("/mbuggy/os2/points", 1, &PointCloudProcessor::pointCloudCallback, this);
+    // filtered_cloud_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/filtered_pointcloud", 1);
+    // removed_range_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/removed_range", 1);
+    // removed_noise_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/removed_noise", 1);
+    // removed_plane_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/removed_plane", 1);
+
+    pointCloud_subscriber_ = nh.subscribe(input_topic, 1, &PointCloudProcessor::pointCloudCallback, this);
+    filteredCloud_publisher_ = nh.advertise<sensor_msgs::PointCloud2>(output_filtered_topic, 1);
+    remobedNoise_publisher_ = nh.advertise<sensor_msgs::PointCloud2>(output_noise_topic, 1);
 
     f_ = boost::bind(&PointCloudProcessor::dynamicReconfigureCallback, this, _1, _2);
     server_.setCallback(f_);
 
-    // Default parameter values
-    min_range_ = 3.0;
-    max_range_ = 300.0;
-    noise_mean_k_ = 78;
-    noise_stddev_ = 3.8;
-    radius_search_ = 2.0;
-    min_neighbors_ = 4;
-    max_iterations_ = 1000;
-    ground_distance_threshold_ = 0.1;
+    
 }
 
 void PointCloudProcessor::dynamicReconfigureCallback(os_lidar_filtering::FilterConfig& config, 
@@ -82,25 +95,38 @@ void PointCloudProcessor::pointCloudCallback(const sensor_msgs::PointCloud2Const
     execution_time = (end_ - start_).toNSec() * 1e-6;
     ROS_INFO_STREAM("Ground Plane Removal Exectution time (ms): " << execution_time);
 
-    sensor_msgs::PointCloud2 output;
-    pcl::toROSMsg(*filteredGround, output);
-    output.header = cloud_msg->header;
-    filtered_cloud_pub_.publish(output);
+    pcl::PointCloud<pcl::PointXYZ>::Ptr allRemovedNoise(new pcl::PointCloud<pcl::PointXYZ>);
+    *allRemovedNoise = *removedRange + *removedNoise + *removedGround;
 
-    sensor_msgs::PointCloud2 removed_range_output;
-    pcl::toROSMsg(*removedRange, removed_range_output);
-    removed_range_output.header = cloud_msg->header;
-    removed_range_pub_.publish(removed_range_output);
+    sensor_msgs::PointCloud2 output_filtered;
+    pcl::toROSMsg(*filteredGround, output_filtered);
+    output_filtered.header = cloud_msg->header;
+    filteredCloud_publisher_.publish(output_filtered);
 
-    sensor_msgs::PointCloud2 removed_noise_output;
-    pcl::toROSMsg(*removedNoise, removed_noise_output);
-    removed_noise_output.header = cloud_msg->header;
-    removed_noise_pub_.publish(removed_noise_output);
+    sensor_msgs::PointCloud2 output_noise;
+    pcl::toROSMsg(*allRemovedNoise, output_noise);
+    output_noise.header = cloud_msg->header;
+    remobedNoise_publisher_.publish(output_noise);
 
-    sensor_msgs::PointCloud2 removed_plane_output;
-    pcl::toROSMsg(*removedGround, removed_plane_output);
-    removed_plane_output.header = cloud_msg->header;
-    removed_plane_pub_.publish(removed_plane_output);
+    // sensor_msgs::PointCloud2 output;
+    // pcl::toROSMsg(*filteredGround, output);
+    // output.header = cloud_msg->header;
+    // filtered_cloud_pub_.publish(output);
+
+    // sensor_msgs::PointCloud2 removed_range_output;
+    // pcl::toROSMsg(*removedRange, removed_range_output);
+    // removed_range_output.header = cloud_msg->header;
+    // removed_range_pub_.publish(removed_range_output);
+
+    // sensor_msgs::PointCloud2 removed_noise_output;
+    // pcl::toROSMsg(*removedNoise, removed_noise_output);
+    // removed_noise_output.header = cloud_msg->header;
+    // removed_noise_pub_.publish(removed_noise_output);
+
+    // sensor_msgs::PointCloud2 removed_plane_output;
+    // pcl::toROSMsg(*removedGround, removed_plane_output);
+    // removed_plane_output.header = cloud_msg->header;
+    // removed_plane_pub_.publish(removed_plane_output);
 }
 
 void PointCloudProcessor::filterByRange(pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud, 
