@@ -11,7 +11,7 @@ git clone https://github.com/MoTahoun/docker_tii_assessment.git
 ```
 
 #### Build docker
-The following command will build the docker file that encapsulate all the requirements to run the ros package
+The following command will build the [Dockerfile](https://github.com/MoTahoun/docker_tii_assessment/blob/main/Dockerfile) that encapsulate all the requirements to run the ros package
 ```bash
 docker build -t lidar_filtering .
 ```
