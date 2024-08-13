@@ -1,1 +1,7 @@
 *.bag
+*.code-workspace
+tii_ws/build/
+tii_ws/devel/
+tii_ws/.catkin_tools/
+tii_ws/.vscode/
+
