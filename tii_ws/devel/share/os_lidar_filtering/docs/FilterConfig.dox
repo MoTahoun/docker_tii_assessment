@@ -2,6 +2,9 @@
 
 Reads and maintains the following parameters on the ROS server
 
+- \b "~leaf_size" : \b [double] leaf siwe for voxel grid downsampling min: 0.0, default: 0.01, max: 0.5
+- \b "~intensity_min" : \b [double] Minimum range for applying intensity filter min: 0.0, default: 3.0, max: 1000.0
+- \b "~intensity_max" : \b [double] Maximum range for applying intensity filter min: 0.0, default: 300.0, max: 1000.0
 - \b "~min_range" : \b [double] Minimum range for pass-through filter min: 0.0, default: 3.0, max: 1000.0
 - \b "~max_range" : \b [double] Maximum range for pass-through filter min: 0.0, default: 300.0, max: 1000.0
 - \b "~noise_mean_k" : \b [int] Mean K for statistical outlier removal min: 1, default: 78, max: 100

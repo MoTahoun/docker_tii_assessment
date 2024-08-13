@@ -1,6 +1,9 @@
 \subsubsection usage Usage
 \verbatim
 <node name="os_lidar_filtering_node" pkg="os_lidar_filtering" type="os_lidar_filtering_node">
+  <param name="leaf_size" type="double" value="0.01" />
+  <param name="intensity_min" type="double" value="3.0" />
+  <param name="intensity_max" type="double" value="300.0" />
   <param name="min_range" type="double" value="3.0" />
   <param name="max_range" type="double" value="300.0" />
   <param name="noise_mean_k" type="int" value="78" />

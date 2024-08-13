@@ -239,6 +239,9 @@ class DEFAULT
         boost::any val;
         (*_i)->getValue(config, val);
 
+        if("leaf_size"==(*_i)->name){leaf_size = boost::any_cast<double>(val);}
+        if("intensity_min"==(*_i)->name){intensity_min = boost::any_cast<double>(val);}
+        if("intensity_max"==(*_i)->name){intensity_max = boost::any_cast<double>(val);}
         if("min_range"==(*_i)->name){min_range = boost::any_cast<double>(val);}
         if("max_range"==(*_i)->name){max_range = boost::any_cast<double>(val);}
         if("noise_mean_k"==(*_i)->name){noise_mean_k = boost::any_cast<int>(val);}
@@ -250,7 +253,10 @@ class DEFAULT
       }
     }
 
-    double min_range;
+    double leaf_size;
+double intensity_min;
+double intensity_max;
+double min_range;
 double max_range;
 int noise_mean_k;
 double noise_stddev;
@@ -267,6 +273,12 @@ double ground_distance_threshold;
 
 
 
+//#line 291 "/opt/ros/noetic/lib/python3/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      double leaf_size;
+//#line 291 "/opt/ros/noetic/lib/python3/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      double intensity_min;
+//#line 291 "/opt/ros/noetic/lib/python3/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      double intensity_max;
 //#line 291 "/opt/ros/noetic/lib/python3/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
       double min_range;
 //#line 291 "/opt/ros/noetic/lib/python3/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
@@ -421,6 +433,36 @@ double ground_distance_threshold;
     FilterConfigStatics()
     {
 FilterConfig::GroupDescription<FilterConfig::DEFAULT, FilterConfig> Default("Default", "", 0, 0, true, &FilterConfig::groups);
+//#line 291 "/opt/ros/noetic/lib/python3/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __min__.leaf_size = 0.0;
+//#line 291 "/opt/ros/noetic/lib/python3/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __max__.leaf_size = 0.5;
+//#line 291 "/opt/ros/noetic/lib/python3/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __default__.leaf_size = 0.01;
+//#line 291 "/opt/ros/noetic/lib/python3/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      Default.abstract_parameters.push_back(FilterConfig::AbstractParamDescriptionConstPtr(new FilterConfig::ParamDescription<double>("leaf_size", "double", 0, "leaf siwe for voxel grid downsampling", "", &FilterConfig::leaf_size)));
+//#line 291 "/opt/ros/noetic/lib/python3/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __param_descriptions__.push_back(FilterConfig::AbstractParamDescriptionConstPtr(new FilterConfig::ParamDescription<double>("leaf_size", "double", 0, "leaf siwe for voxel grid downsampling", "", &FilterConfig::leaf_size)));
+//#line 291 "/opt/ros/noetic/lib/python3/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __min__.intensity_min = 0.0;
+//#line 291 "/opt/ros/noetic/lib/python3/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __max__.intensity_min = 1000.0;
+//#line 291 "/opt/ros/noetic/lib/python3/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __default__.intensity_min = 3.0;
+//#line 291 "/opt/ros/noetic/lib/python3/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      Default.abstract_parameters.push_back(FilterConfig::AbstractParamDescriptionConstPtr(new FilterConfig::ParamDescription<double>("intensity_min", "double", 0, "Minimum range for applying intensity filter", "", &FilterConfig::intensity_min)));
+//#line 291 "/opt/ros/noetic/lib/python3/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __param_descriptions__.push_back(FilterConfig::AbstractParamDescriptionConstPtr(new FilterConfig::ParamDescription<double>("intensity_min", "double", 0, "Minimum range for applying intensity filter", "", &FilterConfig::intensity_min)));
+//#line 291 "/opt/ros/noetic/lib/python3/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __min__.intensity_max = 0.0;
+//#line 291 "/opt/ros/noetic/lib/python3/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __max__.intensity_max = 1000.0;
+//#line 291 "/opt/ros/noetic/lib/python3/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __default__.intensity_max = 300.0;
+//#line 291 "/opt/ros/noetic/lib/python3/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      Default.abstract_parameters.push_back(FilterConfig::AbstractParamDescriptionConstPtr(new FilterConfig::ParamDescription<double>("intensity_max", "double", 0, "Maximum range for applying intensity filter", "", &FilterConfig::intensity_max)));
+//#line 291 "/opt/ros/noetic/lib/python3/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
+      __param_descriptions__.push_back(FilterConfig::AbstractParamDescriptionConstPtr(new FilterConfig::ParamDescription<double>("intensity_max", "double", 0, "Maximum range for applying intensity filter", "", &FilterConfig::intensity_max)));
 //#line 291 "/opt/ros/noetic/lib/python3/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"
       __min__.min_range = 0.0;
 //#line 291 "/opt/ros/noetic/lib/python3/dist-packages/dynamic_reconfigure/parameter_generator_catkin.py"

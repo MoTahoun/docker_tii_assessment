@@ -30,11 +30,12 @@ private:
     ros::WallTime start_;
     ros::WallTime end_;
     double execution_time;
+    double total_execution_time;
 
-    double min_range_;
-    double max_range_;
-    double noise_mean_k_;
-    double noise_stddev_;
+    double leaf_size_;
+    double intensity_min_, intensity_max_;
+    double min_range_, max_range_;
+    double noise_mean_k_, noise_stddev_;
     double radius_search_;
     int min_neighbors_;
     int max_iterations_;
@@ -45,28 +46,28 @@ private:
 
     void dynamicReconfigureCallback(os_lidar_filtering::FilterConfig &config, uint32_t level);
 
-    // void preProcessPointCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud);
-    void filterByRange(pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud, 
-                       pcl::PointCloud<pcl::PointXYZ>::Ptr& filteredCloud,
-                       pcl::PointCloud<pcl::PointXYZ>::Ptr& removed);
-    void filterNoise(pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud,
-                     pcl::PointCloud<pcl::PointXYZ>::Ptr& filteredCloud,
-                     pcl::PointCloud<pcl::PointXYZ>::Ptr& removedNoise);
-    void filterGroundPlane(pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud, 
-                           pcl::PointCloud<pcl::PointXYZ>::Ptr& filteredCloud,
-                           pcl::PointCloud<pcl::PointXYZ>::Ptr& removedNoise);
+    // void preProcessPointCloud(pcl::PointCloud<pcl::PointXYZI>::Ptr cloud);
+    void rangeFilter(pcl::PointCloud<pcl::PointXYZI>::Ptr& cloud, 
+                       pcl::PointCloud<pcl::PointXYZI>::Ptr& filteredCloud,
+                       pcl::PointCloud<pcl::PointXYZI>::Ptr& removed);
 
-    // void filterGroundPlane(pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud, 
-    //                        pcl::PointIndices::Ptr& ground_indices);
+    void statisticalOutlierRemovalFilter(pcl::PointCloud<pcl::PointXYZI>::Ptr& cloud,
+                                         pcl::PointCloud<pcl::PointXYZI>::Ptr& filteredCloud,
+                                         pcl::PointCloud<pcl::PointXYZI>::Ptr& removedNoise);
 
-    void voxelGridFilter(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud);
-    void passThroughFilter(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud);
-    // void concatenatePointClouds(const pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud1,
-    //                             const pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud2,
-    //                             pcl::PointCloud<pcl::PointXYZ>::Ptr& output_cloud)
-    
-    // void filterGroundPlane(pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud, 
-    //                        pcl::PointIndices::Ptr& ground_indices);
+    void radiousOutlierRemovalFilter(pcl::PointCloud<pcl::PointXYZI>::Ptr& cloud,
+                                     pcl::PointCloud<pcl::PointXYZI>::Ptr& filteredCloud,
+                                     pcl::PointCloud<pcl::PointXYZI>::Ptr& removedNoise);
+
+    void groundPlaneFilter(pcl::PointCloud<pcl::PointXYZI>::Ptr& cloud, 
+                           pcl::PointCloud<pcl::PointXYZI>::Ptr& filteredCloud,
+                           pcl::PointCloud<pcl::PointXYZI>::Ptr& removedNoise);
+
+    void voxelGridFilter(pcl::PointCloud<pcl::PointXYZI>::Ptr& cloud);
+
+    void passThroughFilter(pcl::PointCloud<pcl::PointXYZI>::Ptr& cloud, 
+                           pcl::PointCloud<pcl::PointXYZI>::Ptr& filteredCloud,
+                           pcl::PointCloud<pcl::PointXYZI>::Ptr& removedNoise);  
 
 public:
     PointCloudProcessor(ros::NodeHandle& nh, const std::map<std::string, std::string>& params);

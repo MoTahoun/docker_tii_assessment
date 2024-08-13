@@ -16,6 +16,18 @@ int main(int argc, char** argv) {
     nh.getParam("output_filtered_topic", params["output_filtered_topic"]);
     nh.getParam("output_noise_topic", params["output_noise_topic"]);
 
+    double leaf_size;
+    nh.getParam("leaf_size", leaf_size);
+    params["leaf_size"] = std::to_string(leaf_size);
+    
+    double intensity_min;
+    nh.getParam("intensity_min", intensity_min);
+    params["intensity_min"] = std::to_string(intensity_min);
+
+    double intensity_max;
+    nh.getParam("intensity_max", intensity_max);
+    params["intensity_max"] = std::to_string(intensity_max);
+    
     double min_range;
     nh.getParam("min_range", min_range);
     params["min_range"] = std::to_string(min_range);

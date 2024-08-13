@@ -12,6 +12,9 @@ PointCloudProcessor::PointCloudProcessor(ros::NodeHandle& nh, const std::map<std
     std::string output_noise_topic = params.at("output_noise_topic");
 
     // Initialize Parameters & Dynamic configure server
+    leaf_size_ = std::stof(params.at("leaf_size"));
+    intensity_min_ = std::stof(params.at("intensity_min"));
+    intensity_max_ = std::stof(params.at("intensity_max"));
     min_range_ = std::stof(params.at("min_range"));
     max_range_ = std::stof(params.at("max_range"));
     noise_mean_k_ = std::stoi(params.at("noise_mean_k"));
@@ -20,14 +23,6 @@ PointCloudProcessor::PointCloudProcessor(ros::NodeHandle& nh, const std::map<std
     min_neighbors_ = std::stoi(params.at("min_neighbors"));
     max_iterations_ = std::stoi(params.at("max_iterations"));
     ground_distance_threshold_ = std::stof(params.at("ground_distance_threshold"));
-
-
-    // Initialize subscribers and publishers
-    // point_cloud_sub_ = nh.subscribe("/mbuggy/os2/points", 1, &PointCloudProcessor::pointCloudCallback, this);
-    // filtered_cloud_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/filtered_pointcloud", 1);
-    // removed_range_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/removed_range", 1);
-    // removed_noise_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/removed_noise", 1);
-    // removed_plane_pub_ = nh.advertise<sensor_msgs::PointCloud2>("/removed_plane", 1);
 
     pointCloud_subscriber_ = nh.subscribe(input_topic, 1, &PointCloudProcessor::pointCloudCallback, this);
     filteredCloud_publisher_ = nh.advertise<sensor_msgs::PointCloud2>(output_filtered_topic, 1);
@@ -58,82 +53,82 @@ void PointCloudProcessor::pointCloudCallback(const sensor_msgs::PointCloud2Const
         return;
     }
 
+    ROS_INFO_STREAM("############### Message Received ##############");
+
+    total_execution_time = 0;
+
     // Convert ROS PointCloud2 message to PCL PointCloud
-    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZ>);
-    // boost::shared_ptr<pcl::PointCloud<pcl::PointXYZ>> cloud(new pcl::PointCloud<pcl::PointXYZ>());
+    pcl::PointCloud<pcl::PointXYZI>::Ptr cloud(new pcl::PointCloud<pcl::PointXYZI>);
     pcl::fromROSMsg(*cloud_msg, *cloud);
 
     // Remove points that are out of range
-    pcl::PointCloud<pcl::PointXYZ>::Ptr filteredRange(new pcl::PointCloud<pcl::PointXYZ>);
-    pcl::PointCloud<pcl::PointXYZ>::Ptr removedRange(new pcl::PointCloud<pcl::PointXYZ>);
+    pcl::PointCloud<pcl::PointXYZI>::Ptr filteredRangeCloud(new pcl::PointCloud<pcl::PointXYZI>);
+    pcl::PointCloud<pcl::PointXYZI>::Ptr removedRangeCloud(new pcl::PointCloud<pcl::PointXYZI>);
     start_ = ros::WallTime::now();
-    filterByRange(cloud, filteredRange, removedRange);
+    rangeFilter(cloud, filteredRangeCloud, removedRangeCloud);
     end_ = ros::WallTime::now();
 
     execution_time = (end_ - start_).toNSec() * 1e-6;
+    total_execution_time += execution_time;
     ROS_INFO_STREAM("Filtered Range Exectution time (ms): " << execution_time);
 
-    // Remove noise from the point cloud
-    pcl::PointCloud<pcl::PointXYZ>::Ptr filteredSorRor(new pcl::PointCloud<pcl::PointXYZ>);
-    pcl::PointCloud<pcl::PointXYZ>::Ptr removedNoise(new pcl::PointCloud<pcl::PointXYZ>);
+    // Satatistical Outlier Removal Filter
+    pcl::PointCloud<pcl::PointXYZI>::Ptr filteredSorCloud(new pcl::PointCloud<pcl::PointXYZI>);
+    pcl::PointCloud<pcl::PointXYZI>::Ptr removedSorNoiseCloud(new pcl::PointCloud<pcl::PointXYZI>);
     
     start_ = ros::WallTime::now();
-    filterNoise(filteredRange, filteredSorRor, removedNoise);
+    statisticalOutlierRemovalFilter(filteredRangeCloud, filteredSorCloud, removedSorNoiseCloud);
     end_ = ros::WallTime::now();
 
     execution_time = (end_ - start_).toNSec() * 1e-6;
-    ROS_INFO_STREAM("SOR and ROS Exectution time (ms): " << execution_time);
+    total_execution_time += execution_time;
+    ROS_INFO_STREAM("SOR Exectution time (ms): " << execution_time);
+
+    // Radius Outlier Removal Filter
+    pcl::PointCloud<pcl::PointXYZI>::Ptr filteredRorCloud(new pcl::PointCloud<pcl::PointXYZI>);
+    pcl::PointCloud<pcl::PointXYZI>::Ptr removedRorNoiseCloud(new pcl::PointCloud<pcl::PointXYZI>);
+    
+    start_ = ros::WallTime::now();
+    radiousOutlierRemovalFilter(filteredSorCloud, filteredRorCloud, removedRorNoiseCloud);
+    end_ = ros::WallTime::now();
+
+    execution_time = (end_ - start_).toNSec() * 1e-6;
+    total_execution_time += execution_time;
+    ROS_INFO_STREAM("ROR Exectution time (ms): " << execution_time);
 
     // Ground Plane from the point cloud
-    pcl::PointCloud<pcl::PointXYZ>::Ptr filteredGround(new pcl::PointCloud<pcl::PointXYZ>);
-    pcl::PointCloud<pcl::PointXYZ>::Ptr removedGround(new pcl::PointCloud<pcl::PointXYZ>);
+    pcl::PointCloud<pcl::PointXYZI>::Ptr filteredGroundCloud(new pcl::PointCloud<pcl::PointXYZI>);
+    pcl::PointCloud<pcl::PointXYZI>::Ptr removedGroundCloud(new pcl::PointCloud<pcl::PointXYZI>);
     
     start_ = ros::WallTime::now();
-    filterGroundPlane(filteredSorRor, filteredGround, removedGround);
+    groundPlaneFilter(filteredRorCloud, filteredGroundCloud, removedGroundCloud);
     end_ = ros::WallTime::now();
 
     execution_time = (end_ - start_).toNSec() * 1e-6;
+    total_execution_time += execution_time;
     ROS_INFO_STREAM("Ground Plane Removal Exectution time (ms): " << execution_time);
 
-    pcl::PointCloud<pcl::PointXYZ>::Ptr allRemovedNoise(new pcl::PointCloud<pcl::PointXYZ>);
-    *allRemovedNoise = *removedRange + *removedNoise + *removedGround;
+    ROS_INFO_STREAM("Total Execution Time (ms): " << total_execution_time << "\n");
 
-    sensor_msgs::PointCloud2 output_filtered;
-    pcl::toROSMsg(*filteredGround, output_filtered);
-    output_filtered.header = cloud_msg->header;
-    filteredCloud_publisher_.publish(output_filtered);
+    pcl::PointCloud<pcl::PointXYZI>::Ptr removedNoiseCloud(new pcl::PointCloud<pcl::PointXYZI>);
+    *removedNoiseCloud = *removedRangeCloud + *removedSorNoiseCloud + *removedRorNoiseCloud + *removedGroundCloud;
 
-    sensor_msgs::PointCloud2 output_noise;
-    pcl::toROSMsg(*allRemovedNoise, output_noise);
-    output_noise.header = cloud_msg->header;
-    remobedNoise_publisher_.publish(output_noise);
+    sensor_msgs::PointCloud2 outputFiltered;
+    pcl::toROSMsg(*filteredGroundCloud, outputFiltered);
+    outputFiltered.header = cloud_msg->header;
+    outputFiltered.fields = cloud_msg->fields;
+    filteredCloud_publisher_.publish(outputFiltered);
 
-    // sensor_msgs::PointCloud2 output;
-    // pcl::toROSMsg(*filteredGround, output);
-    // output.header = cloud_msg->header;
-    // filtered_cloud_pub_.publish(output);
-
-    // sensor_msgs::PointCloud2 removed_range_output;
-    // pcl::toROSMsg(*removedRange, removed_range_output);
-    // removed_range_output.header = cloud_msg->header;
-    // removed_range_pub_.publish(removed_range_output);
-
-    // sensor_msgs::PointCloud2 removed_noise_output;
-    // pcl::toROSMsg(*removedNoise, removed_noise_output);
-    // removed_noise_output.header = cloud_msg->header;
-    // removed_noise_pub_.publish(removed_noise_output);
-
-    // sensor_msgs::PointCloud2 removed_plane_output;
-    // pcl::toROSMsg(*removedGround, removed_plane_output);
-    // removed_plane_output.header = cloud_msg->header;
-    // removed_plane_pub_.publish(removed_plane_output);
+    sensor_msgs::PointCloud2 outputNoise;
+    pcl::toROSMsg(*removedNoiseCloud, outputNoise);
+    outputNoise.header = cloud_msg->header;
+    outputNoise.fields = cloud_msg->fields;
+    remobedNoise_publisher_.publish(outputNoise);
 }
 
-void PointCloudProcessor::filterByRange(pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud, 
-                                        pcl::PointCloud<pcl::PointXYZ>::Ptr& filteredCloud,
-                                        pcl::PointCloud<pcl::PointXYZ>::Ptr& removed) {
-
-    // pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered(new pcl::PointCloud<pcl::PointXYZ>());
+void PointCloudProcessor::rangeFilter(pcl::PointCloud<pcl::PointXYZI>::Ptr& cloud, 
+                                      pcl::PointCloud<pcl::PointXYZI>::Ptr& filteredCloud,
+                                      pcl::PointCloud<pcl::PointXYZI>::Ptr& removed) {
 
     // Iterate through the input cloud and filter based on distance from the origin
     for (const auto& point : cloud->points)
@@ -157,53 +152,48 @@ void PointCloudProcessor::filterByRange(pcl::PointCloud<pcl::PointXYZ>::Ptr& clo
     removed->is_dense = true;
 }
 
-void PointCloudProcessor::filterNoise(pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud,
-                                      pcl::PointCloud<pcl::PointXYZ>::Ptr& filteredCloud,
-                                      pcl::PointCloud<pcl::PointXYZ>::Ptr& removedNoise) {
-
-    pcl::PointCloud<pcl::PointXYZ>::Ptr filteredSor(new pcl::PointCloud<pcl::PointXYZ>());
-    pcl::PointCloud<pcl::PointXYZ>::Ptr removedSor(new pcl::PointCloud<pcl::PointXYZ>());
+void PointCloudProcessor::statisticalOutlierRemovalFilter(pcl::PointCloud<pcl::PointXYZI>::Ptr& cloud,
+                                                          pcl::PointCloud<pcl::PointXYZI>::Ptr& filteredCloud,
+                                                          pcl::PointCloud<pcl::PointXYZI>::Ptr& removedNoise) {
     
-    pcl::StatisticalOutlierRemoval<pcl::PointXYZ> sor;
+    pcl::StatisticalOutlierRemoval<pcl::PointXYZI> sor;
     sor.setInputCloud(cloud);
     sor.setMeanK(noise_mean_k_);
     sor.setStddevMulThresh(noise_stddev_);
 
     // Filter inliers
-    sor.filter(*filteredSor);
+    sor.filter(*filteredCloud);
 
     // Extract outliers
     sor.setNegative(true);
-    sor.filter(*removedSor);
-
-    // RadiusOutlierRemoval filter
-    pcl::PointCloud<pcl::PointXYZ>::Ptr filteredSorRor(new pcl::PointCloud<pcl::PointXYZ>());
-    pcl::PointCloud<pcl::PointXYZ>::Ptr removedRor(new pcl::PointCloud<pcl::PointXYZ>());
-
-    pcl::RadiusOutlierRemoval<pcl::PointXYZ> outrem;
-    outrem.setInputCloud(filteredSor);
-    outrem.setRadiusSearch(radius_search_);
-    outrem.setMinNeighborsInRadius(min_neighbors_);
-
-    // Filter inliers
-    outrem.filter(*filteredSorRor);
-
-    // Extract outliers
-    outrem.setNegative(true);
-    outrem.filter(*removedRor);
-
-    *filteredCloud = *filteredSorRor;
-    *removedNoise = *removedSor + *removedRor;
+    sor.filter(*removedNoise);
 }
 
-void PointCloudProcessor::filterGroundPlane(pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud, 
-                                            pcl::PointCloud<pcl::PointXYZ>::Ptr& filteredCloud,
-                                            pcl::PointCloud<pcl::PointXYZ>::Ptr& removedNoise) {
+void PointCloudProcessor::radiousOutlierRemovalFilter(pcl::PointCloud<pcl::PointXYZI>::Ptr& cloud,
+                                                      pcl::PointCloud<pcl::PointXYZI>::Ptr& filteredCloud,
+                                                      pcl::PointCloud<pcl::PointXYZI>::Ptr& removedNoise) {
+
+    pcl::RadiusOutlierRemoval<pcl::PointXYZI> ror;
+    ror.setInputCloud(cloud);
+    ror.setRadiusSearch(radius_search_);
+    ror.setMinNeighborsInRadius(min_neighbors_);
+
+    // Filter inliers
+    ror.filter(*filteredCloud);
+
+    // Extract outliers
+    ror.setNegative(true);
+    ror.filter(*removedNoise);
+}
+
+void PointCloudProcessor::groundPlaneFilter(pcl::PointCloud<pcl::PointXYZI>::Ptr& cloud, 
+                                            pcl::PointCloud<pcl::PointXYZI>::Ptr& filteredCloud,
+                                            pcl::PointCloud<pcl::PointXYZI>::Ptr& removedNoise) {
 
     pcl::PointIndices::Ptr inliersGround(new pcl::PointIndices);
     pcl::ModelCoefficients::Ptr coefficients(new pcl::ModelCoefficients);
     
-    pcl::SACSegmentation<pcl::PointXYZ> seg;
+    pcl::SACSegmentation<pcl::PointXYZI> seg;
     seg.setOptimizeCoefficients(true);
     seg.setModelType(pcl::SACMODEL_PLANE);
     seg.setMethodType(pcl::SAC_RANSAC);
@@ -213,7 +203,7 @@ void PointCloudProcessor::filterGroundPlane(pcl::PointCloud<pcl::PointXYZ>::Ptr&
     seg.setInputCloud(cloud);
     seg.segment(*inliersGround, *coefficients);
 
-    pcl::ExtractIndices<pcl::PointXYZ> extract;
+    pcl::ExtractIndices<pcl::PointXYZI> extract;
     extract.setInputCloud(cloud);
     extract.setIndices(inliersGround);
     extract.setNegative(true);
@@ -223,90 +213,26 @@ void PointCloudProcessor::filterGroundPlane(pcl::PointCloud<pcl::PointXYZ>::Ptr&
     extract.filter(*removedNoise);
 }
 
-
-
-void PointCloudProcessor::voxelGridFilter(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud) {
+void PointCloudProcessor::voxelGridFilter(pcl::PointCloud<pcl::PointXYZI>::Ptr& cloud) {
     // Perform point cloud preprocessing here
-    pcl::VoxelGrid<pcl::PointXYZ> voxelGrid;
+    pcl::VoxelGrid<pcl::PointXYZI> voxelGrid;
     voxelGrid.setInputCloud(cloud);
     voxelGrid.setLeafSize(0.1f, 0.1f, 0.1f);
     voxelGrid.filter(*cloud);
 }
 
-void PointCloudProcessor::passThroughFilter(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud) {
-    // Perform point cloud preprocessing here
-    pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered_x(new pcl::PointCloud<pcl::PointXYZ>());
-    pcl::PassThrough<pcl::PointXYZ> passX;
-    passX.setInputCloud(cloud);
-    passX.setFilterFieldName("x");
-    passX.setFilterLimits(3, 200);
-	// passX.setNegative(true);
-    passX.filter(*cloud);
+void PointCloudProcessor::passThroughFilter(pcl::PointCloud<pcl::PointXYZI>::Ptr& cloud, 
+                                            pcl::PointCloud<pcl::PointXYZI>::Ptr& filteredCloud,
+                                            pcl::PointCloud<pcl::PointXYZI>::Ptr& removedNoise) {
+    
+    pcl::PassThrough<pcl::PointXYZI> passIntensity;
+    passIntensity.setInputCloud(cloud);
+    passIntensity.setFilterFieldName("intensity");
+    passIntensity.setFilterLimits(0.0, 255.0);
+	
+    passIntensity.filter(*removedNoise);
 
-    // pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered_y(new pcl::PointCloud<pcl::PointXYZ>());
-    // pcl::PassThrough<pcl::PointXYZ> passY;
-    // passY.setInputCloud(cloud);
-    // passY.setFilterFieldName("y");
-    // passY.setFilterLimits(0, 200);
-	// // passX.setNegative(true);
-    // passY.filter(*cloud_filtered_y);
-
-    // concatenatePointClouds(cloud_filtered_x, cloud_filtered_y, cloud);
-
-    // // Enable extraction of removed indices
-    // pass.setKeepOrganized(true);
-    // pass.setExtractRemovedIndices(true);
-
-    // // Apply the filter
-    // pcl::PointIndices::Ptr removed_indices(new pcl::PointIndices);
-    // pass.filter(*cloud_filtered);
-    // pass.getRemovedIndices(*removed_indices);
-
-    // // Use removed_indices to access the removed points from the original cloud
-    // for (int index : removed_indices->indices) {
-    //     pcl::PointXYZ removed_point = cloud->points[index];
-    //     // Process the removed point
-    // }
+    passIntensity.setNegative(true);
+    passIntensity.filter(*filteredCloud);
 }
 
-
-
-
-
-// void PointCloudProcessor::concatenatePointClouds(const pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud1,
-//                                                  const pcl::PointCloud<pcl::PointXYZ>::Ptr& cloud2,
-//                                                  pcl::PointCloud<pcl::PointXYZ>::Ptr& output_cloud)
-// {
-//     // Concatenate the two point clouds
-//     pcl::concatenatePointCloud(*cloud1, *cloud2, *output_cloud);
-// }
-
-
-
-
-
-// void PointCloudProcessor::preProcessPointCloud(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud) {
-//     // Define the distance range for filtering
-//     double min_distance = 3.0;  // Minimum distance in meters
-//     double max_distance = 200.0; // Maximum distance in meters
-
-//     pcl::PointCloud<pcl::PointXYZ>::Ptr cloud_filtered(new pcl::PointCloud<pcl::PointXYZ>());
-
-//     // Iterate through the input cloud and filter based on distance from the origin
-//     for (const auto& point : cloud->points)
-//     {
-//         double distance = std::sqrt(point.x * point.x + point.y * point.y + point.z * point.z);
-
-//         if (distance >= min_distance && distance <= max_distance)
-//         {
-//             cloud_filtered->points.push_back(point);
-//         }
-//     }
-
-//     cloud_filtered->width = cloud_filtered->points.size();
-//     cloud_filtered->height = 1; // Unordered point cloud
-//     cloud_filtered->is_dense = true;
-
-//     *cloud = *cloud_filtered;
-
-// }
