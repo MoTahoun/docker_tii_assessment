@@ -16,7 +16,7 @@ The following command will build the docker file that encapsulate all the requir
 docker build -t lidar_filtering .
 ```
 
-#### Usage
+## Usage
 ### Run docker
 In the terminal and directory
 ```bash
