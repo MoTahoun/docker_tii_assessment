@@ -19,11 +19,6 @@
 
 class PointCloudProcessor {
 private:
-    ros::Subscriber point_cloud_sub_;
-    ros::Publisher filtered_cloud_pub_;
-    ros::Publisher removed_range_pub_;
-    ros::Publisher removed_noise_pub_;
-    ros::Publisher removed_plane_pub_;
     ros::Subscriber pointCloud_subscriber_;
     ros::Publisher filteredCloud_publisher_;
     ros::Publisher remobedNoise_publisher_;
