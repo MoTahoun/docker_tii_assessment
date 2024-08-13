@@ -1,5 +1,6 @@
 *.bag
 *.code-workspace
+*.catkin_workspace
 tii_ws/build/
 tii_ws/devel/
 tii_ws/.catkin_tools/

@@ -13,6 +13,7 @@ git clone https://github.com/MoTahoun/docker_tii_assessment.git
 #### Build docker
 The following command will build the [Dockerfile](https://github.com/MoTahoun/docker_tii_assessment/blob/main/Dockerfile) that encapsulate all the requirements to run the ros package
 ```bash
+cd docker_tii_assessment
 docker build -t lidar_filtering .
 ```
 
@@ -27,6 +28,7 @@ In the terminal and directory
 ```bash
 cd tii_ws
 catkin_make
+source ~/.bashrc
 ```
 
 ### Run the filtering algorithm
