@@ -108,3 +108,4 @@ void parseParameters(ros::NodeHandle& nh, std::map<std::string, std::string>& pa
     nh.getParam("cluster_max", cluster_max);
     params["cluster_max"] = std::to_string(cluster_max);
 }
+
