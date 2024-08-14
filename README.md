@@ -1,4 +1,8 @@
 
+<p align="center">
+<img src="Documentation/Figures/data_flow_diagram.png" alt="Front readme image" width=100%>
+</p>
+
 ## Installation
 
 #### Prerequisites
