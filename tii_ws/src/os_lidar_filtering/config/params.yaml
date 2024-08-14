@@ -1,14 +1,49 @@
-input_topic: "/mbuggy/os3/points"
-output_filtered_topic: "/output/filtered_cloud"
-output_noise_topic: "/output/noise_cloud"
-leaf_size: 0.01
-intensity_min: 0.0
-intensity_max: 100.0
-min_range: 3.0
-max_range: 300.0
-noise_mean_k: 78
-noise_stddev: 3.8
-radius_search: 2.0
-min_neighbors: 4
-max_iterations: 1000
-ground_distance_threshold: 0.1
+# Main input and output topics
+input_topic: "/mbuggy/os3/points"  # The ROS topic from which the point cloud data is subscribed.
+output_filtered_topic: "/output/filtered_cloud"  # The ROS topic where the filtered point cloud data is published.
+output_noise_topic: "/output/noise_cloud"  # The ROS topic where the noise points removed during filtering are published.
+
+# Intermediate Published topics for fine tuning filters
+range_output_filtered_topic: "/inter_output/filtered/range_filtered_cloud"  # Topic for publishing range-filtered point cloud.
+range_output_noise_topic: "/inter_output/noise/range_noise_cloud"  # Topic for publishing noise points removed by range filtering.
+
+sor_output_filtered_topic: "/inter_output/filtered/sor_filtered_cloud"  # Topic for publishing point cloud after statistical outlier removal.
+sor_output_noise_topic: "/inter_output/noise/sor_noise_cloud"  # Topic for publishing noise points removed by statistical outlier removal.
+
+ror_output_filtered_topic: "/inter_output/filtered/ror_filtered_cloud"  # Topic for publishing point cloud after radius outlier removal.
+ror_output_noise_topic: "/inter_output/noise/ror_noise_cloud"  # Topic for publishing noise points removed by radius outlier removal.
+
+plane_output_filtered_topic: "/inter_output/filtered/plane_filtered_cloud"  # Topic for publishing point cloud after ground plane removal.
+plane_output_noise_topic: "/inter_output/noise/plane_noise_cloud"  # Topic for publishing ground plane points removed during segmentation.
+
+clustering_output_filtered_topic: "/inter_output/filtered/clustering_filtered_cloud"  # Topic for publishing point cloud after clustering.
+clustering_output_noise_topic: "/inter_output/noise/clustering_noise_cloud"  # Topic for publishing noise points removed during clustering.
+
+# Filters Parameters
+# Voxel Grid Downsampling Filter parameters
+leaf_size: 0.01  # The size of the voxel grid used for downsampling the point cloud. Smaller values result in a denser point cloud.
+
+# Pass Through Filter parameters for intensity filtering
+min_intensity: 3.0  # The minimum intensity value for points to be retained. Points with intensity below this are considered noise.
+max_intensity: 300.0  # The maximum intensity value for points to be retained. Points with intensity above this are considered noise.
+
+# Range Filter parameters
+min_range: 3.0  # The minimum distance from the origin for points to be retained. Points closer than this are considered noise.
+max_range: 300.0  # The maximum distance from the origin for points to be retained. Points farther than this are considered noise.
+
+# Statistical Outlier Removal Parameters
+noise_mean_k: 75  # The number of nearest neighbors to use for mean distance estimation in the statistical outlier removal filter.
+noise_stddev: 3  # The standard deviation multiplier threshold for determining outliers.
+
+# Radius Outlier Removal Parameters
+radius_search: 3.5  # The radius within which to search for neighboring points in the radius outlier removal filter.
+min_neighbors: 3  # The minimum number of neighbors required within the radius for a point to be considered an inlier.
+
+# RANSAC ground plane segmentation Parameters
+max_iterations: 1000  # The maximum number of iterations for the RANSAC algorithm used in ground plane segmentation.
+ground_distance_threshold: 0.12  # The distance threshold for a point to be considered an inlier of the plane.
+
+# Euclidean Extraction Clustering Parameters
+cluster_tolerance: 0.1  # The maximum distance between points in a cluster.
+cluster_min: 100  # The minimum number of points required to form a cluster.
+cluster_max: 25000  # The maximum number of points allowed in a cluster.
