@@ -389,7 +389,7 @@ void PointCloudProcessor::radiousOutlierRemovalFilter(pcl::PointCloud<pcl::Point
     // Extract outliers (noise points)
     ror.setNegative(true);
     ror.filter(*removedNoise);
-}
+} 
 
 /**
  * @brief Applies a ground plane removal filter to a point cloud.

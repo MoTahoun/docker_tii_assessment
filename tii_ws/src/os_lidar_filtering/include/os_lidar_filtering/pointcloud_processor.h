@@ -154,4 +154,4 @@ public:
     void pointCloudCallback(const sensor_msgs::PointCloud2ConstPtr& cloud_msg);
 };
 
-#endif // OS_LIDAR_FILTERING
+#endif // OS_LIDAR_FILTERING 
