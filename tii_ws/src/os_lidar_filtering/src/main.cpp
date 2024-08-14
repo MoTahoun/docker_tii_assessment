@@ -4,6 +4,12 @@
 #include <sensor_msgs/PointCloud2.h>
 #include <os_lidar_filtering/pointcloud_processor.h>
 
+/**
+ * @brief function prototype
+ *  This function is responsible for retrieving parameters from the ROS parameter server and storing them in a std::map. 
+ */
+void parseParameters(ros::NodeHandle& nh, std::map<std::string, std::string>& params);
+
 int main(int argc, char** argv) {
     ros::init(argc, argv, "os_lidar_filtering_node");
     ros::NodeHandle nh("~");
@@ -11,22 +17,52 @@ int main(int argc, char** argv) {
     // Initializ Parameters Dictionary
     std::map<std::string, std::string> params;
 
+    // Parse parameters from config/params.yaml file
+    parseParameters(nh, params);
+
+    PointCloudProcessor processor(nh, params);
+    ros::spin();
+    return 0;
+}
+
+/**
+ * @brief This function is responsible for retrieving parameters from the ROS parameter server and storing them in a std::map. 
+ * 
+ * @param nh ros::NodeHandle
+ * @param params reference to the std::map
+ */
+void parseParameters(ros::NodeHandle& nh, std::map<std::string, std::string>& params) {
     // Retrieve parameters from the parameter server
     nh.getParam("input_topic", params["input_topic"]);
     nh.getParam("output_filtered_topic", params["output_filtered_topic"]);
     nh.getParam("output_noise_topic", params["output_noise_topic"]);
 
+    nh.getParam("range_output_filtered_topic", params["range_output_filtered_topic"]);
+    nh.getParam("range_output_noise_topic", params["range_output_noise_topic"]);
+
+    nh.getParam("sor_output_filtered_topic", params["sor_output_filtered_topic"]);
+    nh.getParam("sor_output_noise_topic", params["sor_output_noise_topic"]);
+
+    nh.getParam("ror_output_filtered_topic", params["ror_output_filtered_topic"]);
+    nh.getParam("ror_output_noise_topic", params["ror_output_noise_topic"]);
+
+    nh.getParam("plane_output_filtered_topic", params["plane_output_filtered_topic"]);
+    nh.getParam("plane_output_noise_topic", params["plane_output_noise_topic"]);
+
+    nh.getParam("clustering_output_filtered_topic", params["clustering_output_filtered_topic"]);
+    nh.getParam("clustering_output_noise_topic", params["clustering_output_noise_topic"]);
+
     double leaf_size;
     nh.getParam("leaf_size", leaf_size);
     params["leaf_size"] = std::to_string(leaf_size);
-    
-    double intensity_min;
-    nh.getParam("intensity_min", intensity_min);
-    params["intensity_min"] = std::to_string(intensity_min);
 
-    double intensity_max;
-    nh.getParam("intensity_max", intensity_max);
-    params["intensity_max"] = std::to_string(intensity_max);
+    double min_intensity;
+    nh.getParam("min_intensity", min_intensity);
+    params["min_intensity"] = std::to_string(min_intensity);
+    
+    double max_intensity;
+    nh.getParam("max_intensity", max_intensity);
+    params["max_intensity"] = std::to_string(max_intensity);
     
     double min_range;
     nh.getParam("min_range", min_range);
@@ -60,31 +96,15 @@ int main(int argc, char** argv) {
     nh.getParam("ground_distance_threshold", ground_distance_threshold);
     params["ground_distance_threshold"] = std::to_string(ground_distance_threshold);
 
+    double cluster_tolerance;
+    nh.getParam("cluster_tolerance", cluster_tolerance);
+    params["cluster_tolerance"] = std::to_string(cluster_tolerance);
+    
+    int cluster_min;
+    nh.getParam("cluster_min", cluster_min);
+    params["cluster_min"] = std::to_string(cluster_min);
 
-    PointCloudProcessor processor(nh, params);
-    ros::spin();
-    return 0;
-
-    // std::string bag_file;
-    // // nh.param("bag_file", bag_file, std::string("my_rosbag.bag"));
-    // bag_file = "/home/tahoun/git/tii_lidar_filtering/tii_ws/src/pcl_open3d_test/data/LiDARFilteringAssignment.bag";
-
-    // rosbag::Bag bag;
-    // bag.open(bag_file, rosbag::bagmode::Read);
-
-    // std::vector<std::string> topics;
-    // topics.push_back(std::string( ));
-
-    // rosbag::View view(bag, rosbag::TopicQuery(topics));
-
-    // for (rosbag::MessageInstance const m : view) {
-    //     sensor_msgs::PointCloud2ConstPtr cloud_msg = m.instantiate<sensor_msgs::PointCloud2>();
-    //     if (cloud_msg != nullptr) {
-    //         processor.processPointCloud(cloud_msg);
-    //     }
-    // }
-
-    // bag.close();
-    // return 0;
-
+    int cluster_max;
+    nh.getParam("cluster_max", cluster_max);
+    params["cluster_max"] = std::to_string(cluster_max);
 }
