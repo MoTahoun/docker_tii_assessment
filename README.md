@@ -92,16 +92,21 @@ rosrun rqt_reconfigure rqt_reconfigure
 ## Results
 To visually demonstrate the effectiveness of the LiDAR filtering algorithm, a comparison between the raw input point cloud and the final filtered output is presented in Figure~\ref{fig:final_results}. Additionally, the removed noise points are shown to illustrate what the algorithm has filtered out.
 
+<figure>
+  <img src="Documentation/Figures/00_raw_data.png" alt="Raw Lidar Data">
+  <figcaption>Raw Lidar Data</figcaption>
+</figure>
+
 <p align="center">
-<img src="Documentation/Figures/00_raw_data.png" alt="Front readme image" width=100% title="Raw Lidar Data">
+<img src="Documentation/Figures/00_raw_data.png" alt="Raw Lidar Data" width=100% title="Raw Lidar Data">
 </p>
 
 <p align="center">
-<img src="Documentation/Figures/04_filtered_ground.png" alt="Accumulated Removed noise" width=100% title="Raw Lidar Data">
+<img src="Documentation/Figures/04_filtered_ground.png" alt="Accumulated Removed noise" width=100% title="Accumulated Removed noise">
 </p>
 
 <p align="center">
-<img src="Documentation/Figures/05_removed_noise.png" alt="Filtered points" width=100% title="Raw Lidar Data">
+<img src="Documentation/Figures/05_removed_noise.png" alt="Filtered points" width=100% title="Filtered points">
 </p>
 
 
