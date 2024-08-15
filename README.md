@@ -64,7 +64,7 @@ To visually demonstrate the effectiveness of the LiDAR filtering algorithm, a co
 </figure>
 
 ## Documentation
-For detailed documentation, please refer to [Documentation](https://github.com/MoTahoun/docker_tii_assessment/blob/main/Documentation/TII_Autonomous Vehicles LiDAR Filtering_Assignement_Documentation.pdf) file.
+For detailed documentation, please refer to the [Documentation](https://github.com/MoTahoun/docker_tii_assessment/blob/main/Documentation/TII_Autonomous Vehicles LiDAR Filtering_Assignement_Documentation.pdf) file
 
 ## Installation
 
