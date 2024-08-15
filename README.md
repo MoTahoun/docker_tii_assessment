@@ -1,11 +1,12 @@
 
 # "LiDAR Point Cloud: Noise Filtering and Ground Removal"
 
-This project focuses on the development of a robust ground and noise filtering algorithm specifically designed for LiDAR point cloud data. The goal is to effectively remove ground points and noise while preserving important features such as trees and buildings. 
-
 ## Table of Contents
+- [Overview](#overview)
 - [Objectives](#objectives)
 - [ROS Node Flow](#ros-node-flow)
+- [Results](#results)
+- [Documentation](#documentation)
 - [Installation](#installation)
   - [Prerequisites](#prerequisites)
   - [Clone repo](#clone-repo)
@@ -17,7 +18,9 @@ This project focuses on the development of a robust ground and noise filtering a
   - [Run the filtering algorithm](#run-the-filtering-algorithm)
   - [Play the bag](#play-the-bag)
   - [For fine tuning, Run rqt dynamic configure](#for-fine-tuning-run-rqt-dynamic-configure)
-- [Results](#results)
+
+## Overview
+This project focuses on the development of a robust ground and noise filtering algorithm specifically designed for LiDAR point cloud data. The goal is to effectively remove ground points and noise while preserving important features such as trees and buildings. 
 
 ## Objectives
 - Development of a ground and noise ﬁltering algorithm on point cloud data using C++ and [Point Cloud Library (PCL)](https://pointclouds.org/).
@@ -40,6 +43,28 @@ This project focuses on the development of a robust ground and noise filtering a
 <p align="center">
 <img src="Documentation/Figures/data_flow_diagram.png" alt="Front readme image" width=100%>
 </p>
+
+## Results
+To visually demonstrate the effectiveness of the LiDAR filtering algorithm, a comparison between the raw input point cloud and the final filtered output is presented in Figure~\ref{fig:final_results}. Additionally, the removed noise points are shown to illustrate what the algorithm has filtered out.
+
+<figure>
+	<figcaption>Raw Lidar Data</figcaption>
+  	<img src="Documentation/Figures/00_raw_data.png" alt="Raw Lidar Data" width=100% title="Raw Lidar Data">
+</figure>
+
+
+<figure>
+	<figcaption>Filtered points</figcaption>
+	<img src="Documentation/Figures/04_filtered_ground.png" alt="Accumulated Removed noise" width=100% title="Filtered points">
+</figure>
+
+<figure>
+	<figcaption>Accumulated Removed noise</figcaption>
+	<img src="Documentation/Figures/05_removed_noise.png" alt="Accumulated Removed noise" width=100% title="Accumulated Removed noise">
+</figure>
+
+## Documentation
+For detailed documentation, please refer to [Documentation](https://github.com/MoTahoun/docker_tii_assessment/blob/main/Documentation/TII_Autonomous Vehicles LiDAR Filtering_Assignement_Documentation.pdf) file.
 
 ## Installation
 
@@ -104,25 +129,6 @@ Open other terminal and play the bag
 docker exec -it lidar_filtering bash
 rosrun rqt_reconfigure rqt_reconfigure
 ```
-
-## Results
-To visually demonstrate the effectiveness of the LiDAR filtering algorithm, a comparison between the raw input point cloud and the final filtered output is presented in Figure~\ref{fig:final_results}. Additionally, the removed noise points are shown to illustrate what the algorithm has filtered out.
-
-<figure>
-	<figcaption>Raw Lidar Data</figcaption>
-  	<img src="Documentation/Figures/00_raw_data.png" alt="Raw Lidar Data" width=100% title="Raw Lidar Data">
-</figure>
-
-
-<figure>
-	<figcaption>Filtered points</figcaption>
-	<img src="Documentation/Figures/04_filtered_ground.png" alt="Accumulated Removed noise" width=100% title="Filtered points">
-</figure>
-
-<figure>
-	<figcaption>Accumulated Removed noise</figcaption>
-	<img src="Documentation/Figures/05_removed_noise.png" alt="Accumulated Removed noise" width=100% title="Accumulated Removed noise">
-</figure>
 
 
 <!---
