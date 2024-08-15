@@ -64,7 +64,7 @@ To visually demonstrate the effectiveness of the LiDAR filtering algorithm, a co
 </figure>
 
 ## Documentation
-For detailed documentation, please refer to the [Documentation](https://github.com/MoTahoun/docker_tii_assessment/blob/main/Documentation/TII_Autonomous Vehicles LiDAR Filtering_Assignement_Documentation.pdf) file
+For detailed documentation, please refer to the [Documentation](Documentation/TII_Autonomous Vehicles LiDAR Filtering_Assignement_Documentation.pdf) file
 
 ## Installation
 
@@ -78,7 +78,7 @@ git clone https://github.com/MoTahoun/docker_tii_assessment.git
 ```
 
 #### Build docker
-The following command will build the [Dockerfile](https://github.com/MoTahoun/docker_tii_assessment/blob/main/Dockerfile) that encapsulate all the requirements to run the ros package
+The following command will build the [Dockerfile](Dockerfile) that encapsulate all the requirements to run the ros package
 ```bash
 cd docker_tii_assessment
 docker build -t lidar_filtering .
