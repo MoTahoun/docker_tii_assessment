@@ -1,4 +1,26 @@
 
+# LiDAR Point Cloud: Noise Filtering and Ground Extraction
+
+This project focuses on the development of a robust ground and noise filtering algorithm specifically designed for LiDAR point cloud data. The goal is to effectively remove ground points and noise while preserving important features such as trees and buildings. 
+
+## Objectives
+- Development of a ground and noise ﬁltering algorithm on point cloud data using C++ and [Point Cloud Library (PCL)](https://pointclouds.org/).
+- [ROS](https://www.ros.org/) package creation
+- [Docker](https://www.docker.com/) packaging
+
+
+## ROS Node Flow
+1. The process begins with raw LiDAR data from the sensor.
+2. This data is published on the ROS topic "/mbuggy/os3/points".
+3. The lidar\_filter\_node subscribes to this topic and receives the raw point cloud data.
+4. Inside the node, the filtering algorithms are applied:
+  - Noise filtering removes noise and irrelevant points
+  - Ground filtering removes ground points
+5. The node then publishes two separate outputs:
+ - \item ("/output/filtered_cloud")
+  - ("/output/noise_cloud")
+
+
 <p align="center">
 <img src="Documentation/Figures/data_flow_diagram.png" alt="Front readme image" width=100%>
 </p>
@@ -6,7 +28,7 @@
 ## Installation
 
 #### Prerequisites
-1. docker, if you don't have you can install it following the docker install instructions [link](https://docs.docker.com/get-docker/).
+1. docker, if you don't have you can install it following the docker [install instructions](https://docs.docker.com/get-docker/).
 
 
 #### Clone repo
@@ -20,6 +42,13 @@ The following command will build the [Dockerfile](https://github.com/MoTahoun/do
 cd docker_tii_assessment
 docker build -t lidar_filtering .
 ```
+
+#### Download the ros bag file
+Create a directory data
+```bash
+mkdir data
+```
+Then, copy the bag file inside that directory.
 
 ## Usage
 ### Run docker
@@ -42,19 +71,38 @@ roslaunch os_lidar_filtering os_lidar_processor.launch
 ```
 
 ### Play the bag
-Please put the bag file inside the package: "/workspace/tii_ws/src/os_lidar_filtering/data/[BAG_NAME].bag"
-Open other terminal and play the bag
+Please download and put the bag file inside the directory workspacepackage: "/workspace/data/[BAG_NAME].bag"
+Open other terminal and play the bag in a loop playback using the tag -l and paused using the tag --pause
 ```bash
 docker exec -it lidar_filtering bash
-rosbag play -l /workspace/tii_ws/src/os_lidar_filtering/data/[BAG_NAME].bag
+rosbag play -l --pause /workspace/data/[BAG_NAME].bag
 ```
+To start publishing bag's topice you should hit space or s to step
 
-### Run dynamic configure to fine tune the parameters
+### For fine tuning, Run rqt dynamic configure 
+<p align="center">
+<img src="Documentation/Figures/rqt_dynamic_reconfigure.png" alt="Front readme image" width=100%>
+</p>
 Open other terminal and play the bag
 ```bash
 docker exec -it lidar_filtering bash
 rosrun rqt_reconfigure rqt_reconfigure
 ```
+
+## Results
+To visually demonstrate the effectiveness of the LiDAR filtering algorithm, a comparison between the raw input point cloud and the final filtered output is presented in Figure~\ref{fig:final_results}. Additionally, the removed noise points are shown to illustrate what the algorithm has filtered out.
+
+<p align="center">
+<img src="Documentation/Figures/00_raw_data.png" alt="Front readme image" width=100% title="Raw Lidar Data">
+</p>
+
+<p align="center">
+<img src="Documentation/Figures/04_filtered_ground.png" alt="Accumulated Removed noise" width=100% title="Raw Lidar Data">
+</p>
+
+<p align="center">
+<img src="Documentation/Figures/05_removed_noise.png" alt="Filtered points" width=100% title="Raw Lidar Data">
+</p>
 
 
 <!---
