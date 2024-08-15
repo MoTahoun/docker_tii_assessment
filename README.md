@@ -64,7 +64,7 @@ To visually demonstrate the effectiveness of the LiDAR filtering algorithm, a co
 </figure>
 
 ## Documentation
-For detailed documentation, please refer to the [Documentation](Documentation/TII_Autonomous Vehicles LiDAR Filtering_Assignement_Documentation.pdf) file
+For detailed documentation, please refer to the [Documentation](Documentation/TII_Autonomous_Vehicles_LiDAR_Filtering_Assignement_Documentation.pdf) file
 
 ## Installation
 
