@@ -14,11 +14,11 @@ This project focuses on the development of a robust ground and noise filtering a
 2. This data is published on the ROS topic "/mbuggy/os3/points".
 3. The lidar\_filter\_node subscribes to this topic and receives the raw point cloud data.
 4. Inside the node, the filtering algorithms are applied:
-  - Noise filtering removes noise and irrelevant points
-  - Ground filtering removes ground points
+	- Noise filtering removes noise and irrelevant points
+	- Ground filtering removes ground points
 5. The node then publishes two separate outputs:
- - \item ("/output/filtered_cloud")
-  - ("/output/noise_cloud")
+	- "/output/filtered_cloud"
+	- "/output/noise_cloud"
 
 
 <p align="center">
