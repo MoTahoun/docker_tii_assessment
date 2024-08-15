@@ -124,7 +124,9 @@ To start publishing bag's topice you should hit space or s to step
 <p align="center">
 <img src="Documentation/Figures/rqt_dynamic_reconfigure.png" alt="Front readme image" width=100%>
 </p>
+
 Open other terminal and play the bag
+
 ```bash
 docker exec -it lidar_filtering bash
 rosrun rqt_reconfigure rqt_reconfigure
