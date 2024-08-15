@@ -1,7 +1,23 @@
 
-# LiDAR Point Cloud: Noise Filtering and Ground Extraction
+# "LiDAR Point Cloud: Noise Filtering and Ground Removal"
 
 This project focuses on the development of a robust ground and noise filtering algorithm specifically designed for LiDAR point cloud data. The goal is to effectively remove ground points and noise while preserving important features such as trees and buildings. 
+
+## Table of Contents
+- [Objectives](#objectives)
+- [ROS Node Flow](#ros-node-flow)
+- [Installation](#installation)
+  - [Prerequisites](#prerequisites)
+  - [Clone repo](#clone-repo)
+  - [Build docker](#build-docker)
+  - [Download the ros bag file](#download-the-ros-bag-file)
+- [Usage](#usage)
+  - [Run docker](#run-docker)
+  - [Build the ROS Package](#build-the-ros-package)
+  - [Run the filtering algorithm](#run-the-filtering-algorithm)
+  - [Play the bag](#play-the-bag)
+  - [For fine tuning, Run rqt dynamic configure](#for-fine-tuning-run-rqt-dynamic-configure)
+- [Results](#results)
 
 ## Objectives
 - Development of a ground and noise ﬁltering algorithm on point cloud data using C++ and [Point Cloud Library (PCL)](https://pointclouds.org/).
